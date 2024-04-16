@@ -4,3 +4,5 @@ torch==2.2.0
 torchaudio==2.2.0
 torchvision==0.17.0
 gymnasium==0.29.1
+pytest==8.0.2
+coverage==7.4.3
