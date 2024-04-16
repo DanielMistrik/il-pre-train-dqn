@@ -1,6 +1,6 @@
 import torch
 from src.policy.services.epsilon_greedy import epsilon_greedy as eg
-from src.nn.dqn import DQN
+from src.nn.services.dqn import DQN
 from unittest.mock import patch
 
 
