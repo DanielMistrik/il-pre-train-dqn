@@ -1,8 +1,7 @@
 # https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
-from collections import namedtuple, deque
+from collections import deque
 import random
-
-Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
+from src.data.models.transition import Transition
 
 
 class ReplayMemory:
