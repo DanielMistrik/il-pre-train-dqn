@@ -2,3 +2,5 @@
 .coverage
 coverage.xml
 *.pyc
+.idea
+src/pretrain/data
