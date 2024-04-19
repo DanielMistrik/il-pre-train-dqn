@@ -3,6 +3,6 @@ ipykernel==6.29.0
 torch==2.2.0
 torchaudio==2.2.0
 torchvision==0.17.0
-gymnasium==0.29.1
+gymnasium[classic_control,box2d,toy_text]==0.29.1
 pytest==8.0.2
 coverage==7.4.3
