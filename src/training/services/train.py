@@ -7,6 +7,8 @@ from src.data.models.transition import Transition
 import torch
 from torch.nn import functional as F
 from src.policy.services.epsilon_greedy import epsilon_greedy
+from torch import device
+from tqdm.auto import tqdm
 
 
 def train_step(
@@ -17,7 +19,7 @@ def train_step(
     optim: Optimizer,
     batch_size: int,
     gamma: float,
-    device: str,
+    device: str | device,
     allow_small_memory: bool = False,
 ):
     """
@@ -48,14 +50,19 @@ def train_step(
         non_final_states_indices, dtype=torch.bool, device=device
     )
     non_final_next_states = [x for x in batch.next_state if x is not None]
-    non_final_next_states = torch.stack(non_final_next_states).to(device)
+    non_final_next_states = (
+        torch.stack(non_final_next_states)
+        .squeeze()
+        .reshape(len(non_final_next_states), -1)
+        .to(device)
+    )
 
-    states = torch.stack(batch.state).to(device)
+    states = torch.stack(batch.state).squeeze().reshape(batch_size, -1).to(device)
     actions = torch.tensor(batch.action, device=device)
     rewards = torch.tensor(batch.reward, device=device)
 
     # predicted Q values
-    state_action_values = dqn(states).gather(1, actions.unsqueeze(-1))
+    state_action_values = dqn(states).gather(1, actions.unsqueeze(0))
 
     # next state discounted Q values
     next_state_values = torch.zeros(batch_size, device=device)
@@ -68,7 +75,7 @@ def train_step(
     target_values = rewards + (gamma * next_state_values)
 
     # loss
-    l = F.smooth_l1_loss(state_action_values, target_values.unsqueeze(1))
+    l = F.smooth_l1_loss(state_action_values, target_values.unsqueeze(0))
 
     # update
     optim.zero_grad()
@@ -85,7 +92,7 @@ def train(
     optim: Optimizer,
     batch_size: int,
     gamma: float,
-    device: str,
+    device: str | device,
     num_episodes: int,
     epsilon: float,
     target_update: int,
@@ -109,11 +116,11 @@ def train(
         with less than batch_size transitions. The number sampled
         will be equal to the length of memory.
     """
-    for episode in range(num_episodes):
-        state = env.reset()
+    for episode in tqdm(range(num_episodes)):
+        state, _ = env.reset()
+        state = torch.tensor(state, device=device, dtype=torch.float32).unsqueeze(0)
         done = False
         while not done:
-            state = torch.tensor(state, device=device).unsqueeze(0)
             action = epsilon_greedy(state, dqn, epsilon)
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
@@ -121,7 +128,9 @@ def train(
             if terminated:
                 next_state = None
             else:
-                next_state = torch.tensor(next_state, device=device).unsqueeze(0)
+                next_state = torch.tensor(
+                    next_state, device=device, dtype=torch.float32
+                ).unsqueeze(0)
 
             memory.push(state, action, next_state, reward)
 

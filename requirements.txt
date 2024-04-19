@@ -6,4 +6,6 @@ torchvision==0.17.0
 gymnasium[classic_control,box2d,toy_text]==0.29.1
 pytest==8.0.2
 coverage==7.4.3
-gymnasium[box2d]
+opencv-python==4.9.0.80
+tqdm==4.66.2
+ipywidgets==8.1.2

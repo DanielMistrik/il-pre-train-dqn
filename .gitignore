@@ -2,5 +2,6 @@
 .coverage
 coverage.xml
 *.pyc
+*.mp4
 .idea
 src/pretrain/data/*
