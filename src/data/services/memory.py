@@ -10,6 +10,12 @@ class ReplayMemory:
         self.memory = deque(maxlen=capacity)
 
     def push(self, *args):
+        """
+        Expected order of arguments:
+        state, action, next_state, reward
+
+        where state and next_state are torch tensors
+        """
         self.memory.append(Transition(*args))
 
     def sample(self, batch_size):
