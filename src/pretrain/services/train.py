@@ -7,7 +7,7 @@ from src.nn.services.dqn import DQN
 from torch.utils.data import DataLoader
 from expert_dataset import ExpertDataset
 from criterion_generator import CEP_Loss
-
+from data_collect import env_names_to_metadata
 
 def eval_model(model, loss_fn, val_loader):
     """
@@ -45,10 +45,16 @@ def run_epoch(model, loss_fn, optimizer, train_loader, val_loader, train_loss, v
     return train_loss, valid_loss
 
 
+def _get_model_name_from_data_path(data_path):
+    for env_name in env_names_to_metadata.keys():
+        if env_name in data_path:
+            return env_name
+
+
 def gen_tv_graph(train_loss, valid_loss, data_path):
     plt.plot(np.arange(len(train_loss)), train_loss, c='blue', label="Train")
     plt.plot(np.arange(len(valid_loss)), valid_loss, c='red', label="Validation")
-    plt.title(f'Train-Validation Graph for model trained on dataset {data_path}')
+    plt.title(f'Train-Validation Graph for model trained on {_get_model_name_from_data_path(data_path)}')
     plt.legend()
     path_to_data_dir = data_path[:data_path.rfind('/')]
     plt.savefig(path_to_data_dir+"/tv_graph_"+data_path[data_path.rfind('/')+1:data_path.rfind('.npy')+1]+".png")
@@ -63,8 +69,8 @@ def pre_train(model, optimizer, data_path, num_epochs, batch_size=64):
     # 80-20 Split
     train_size, val_size = len(expert_dataset) - len(expert_dataset)//5, len(expert_dataset)//5
     train_dataset, val_dataset = torch.utils.data.random_split(expert_dataset, [train_size, val_size])
-    train_loader = DataLoader(expert_dataset, batch_size=batch_size)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size)
+    train_loader = DataLoader(expert_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
     loss_fn = CEP_Loss()
     train_loss, valid_loss = [], []
     # Train for epochs
@@ -78,5 +84,5 @@ if __name__ == '__main__':
     # Test on MountainCar-v0
     dqn = DQN(2, 3)
     optm = Adam(dqn.parameters(), lr=0.001)
-    pre_train(dqn, optm, '../data/MountainCar-v0_0.npy', 10, 32)
+    pre_train(dqn, optm, '../data/MountainCar-v0_10_000.npy', 100, 32)
 

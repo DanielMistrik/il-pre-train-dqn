@@ -16,6 +16,6 @@ class ExpertDataset(Dataset):
 
 
 if __name__ == '__main__':
-    dataset = ExpertDataset('../data/MountainCar-v0_0.npy')
+    dataset = ExpertDataset('../data/MountainCar-v0_10_000.npy')
     print(len(dataset))
     print(dataset.__getitem__(3))

@@ -23,9 +23,12 @@ class CEP_Loss(nn.Module):
         if isinstance(target_action, int):
             weights = torch.ones(pred_q_vals.shape[0]) if weights is None else weights
             target_q_val = pred_q_vals[target_action] * torch.ones(pred_q_vals.shape[0])
+            # We aren't interested in P(i>i) for our loss function
+            weights[target_action] = 0
         else:
-            weights = torch.ones(pred_q_vals.shape[1]) if weights is None else weights
+            weights = torch.ones(pred_q_vals.shape) if weights is None else weights
             target_q_val = pred_q_vals.gather(1, target_action.unsqueeze(1)) * torch.ones(pred_q_vals.shape[1])
+            # We aren't interested in P(i>i) for our loss function
+            weights.scatter_(1, target_action.unsqueeze(1), torch.full_like(weights, 0))
 
-        weights[target_action] = 0  # We aren't interested in P(i>i) for our loss function
         return torch.mul(-1, torch.mul(weights, torch.log(cum_p(target_q_val, pred_q_vals))).sum())

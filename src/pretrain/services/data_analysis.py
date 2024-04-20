@@ -20,4 +20,4 @@ def gen_dataset_action_freq_graph(data_path):
 
 
 if __name__ == '__main__':
-    gen_dataset_action_freq_graph('../data/MountainCar-v0_0.npy')
+    gen_dataset_action_freq_graph('../data/MountainCar-v0_10_000.npy')

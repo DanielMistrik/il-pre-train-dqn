@@ -5,3 +5,4 @@ coverage.xml
 *.mp4
 .idea
 src/pretrain/data/*
+!src/pretrain/data/MountainCar-v0_10_000.npy
