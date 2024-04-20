@@ -19,8 +19,13 @@ class CEP_Loss(nn.Module):
     def __init__(self):
         super(CEP_Loss, self).__init__()
 
-    def forward(self, pred_q_vals: torch.Tensor, target_action: torch.int, weights: torch.Tensor=None):
-        weights = torch.ones(pred_q_vals.shape[0]) if weights is None else weights
-        weights[target_action] = 0 #We aren't interested in P(i>i) for our loss function
-        target_q_val = pred_q_vals[target_action] * torch.ones(pred_q_vals.shape[0])
+    def forward(self, pred_q_vals: torch.Tensor, target_action, weights: torch.Tensor=None):
+        if isinstance(target_action, int):
+            weights = torch.ones(pred_q_vals.shape[0]) if weights is None else weights
+            target_q_val = pred_q_vals[target_action] * torch.ones(pred_q_vals.shape[0])
+        else:
+            weights = torch.ones(pred_q_vals.shape[1]) if weights is None else weights
+            target_q_val = pred_q_vals.gather(1, target_action.unsqueeze(1)) * torch.ones(pred_q_vals.shape[1])
+
+        weights[target_action] = 0  # We aren't interested in P(i>i) for our loss function
         return torch.mul(-1, torch.mul(weights, torch.log(cum_p(target_q_val, pred_q_vals))).sum())
