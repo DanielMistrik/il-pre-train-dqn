@@ -9,6 +9,7 @@ from torch.nn import functional as F
 from src.policy.services.epsilon_greedy import epsilon_greedy
 from torch import device
 from tqdm.auto import tqdm
+from src.pretrain.services.train import pre_train
 
 
 def train_step(
@@ -150,3 +151,74 @@ def train(
 
         if episode % target_update == 0:
             target_net.load_state_dict(dqn.state_dict())
+
+
+def full_training(
+    pretrain_data_path: str,
+    pretrain_epochs: int,
+    pretrain_batch_size: int,
+    pretrain_optimizer: Optimizer,
+    env: Env,
+    memory: ReplayMemory,
+    dqn: Module,
+    target_net: Module,
+    optim: Optimizer,
+    batch_size: int,
+    gamma: float,
+    device: str | device,
+    num_episodes: int,
+    epsilon: float,
+    target_update: int,
+    allow_small_memory: bool = False,
+    pretrain_done_callback=None,
+):
+    """
+    Incorporates pretraining and normal training into one function
+
+    It first pretrains the given dqn model before training it
+    further on the given environment
+
+    @param pretrain_data_path: The path to the pretraining data
+    @param pretrain_epochs: The number of pretraining epochs
+    @param pretrain_batch_size: The pretraining batch size
+    @param pretrain_optimizer: The pretraining optimizer
+    @param env: The environment to train on
+    @param memory: The replay memory to sample from
+    @param dqn: The model to train
+    @param target_net: network used to help calculate target Q values
+    @param optim: The optimizer to use
+    @param batch_size: The number of transitions to sample
+    @param gamma: The discount factor
+    @param device: The device to use for training
+    @param num_episodes: The number of episodes to train for
+    @param epsilon: The probability of taking a random action
+    @param target_update: The number of episodes to update the target network
+    @param allow_small_memory: If True, allow sampling from memory
+        with less than batch_size transitions. The number sampled
+        will be equal to the length of memory.
+    """
+    pre_train(
+        dqn,
+        pretrain_optimizer,
+        pretrain_data_path,
+        pretrain_epochs,
+        pretrain_batch_size,
+        device=device,
+    )
+    target_net.load_state_dict(dqn.state_dict())
+    if pretrain_done_callback is not None:
+        pretrain_done_callback(dqn)
+    train(
+        env,
+        memory,
+        dqn,
+        target_net,
+        optim,
+        batch_size,
+        gamma,
+        device,
+        num_episodes,
+        epsilon,
+        target_update,
+        allow_small_memory,
+    )
