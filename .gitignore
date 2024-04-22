@@ -6,3 +6,5 @@ coverage.xml
 .idea
 src/pretrain/data/*
 !src/pretrain/data/MountainCar-v0_10_000.npy
+/tmp
+/tmpvideo

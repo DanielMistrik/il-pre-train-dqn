@@ -23,3 +23,12 @@ class ReplayMemory:
 
     def __len__(self):
         return len(self.memory)
+
+    def get_memory(self):
+        return self.memory
+
+    def extend(self, memory):
+        """
+        Extends the current memory with the memory passed as argument
+        """
+        self.memory += memory.get_memory()

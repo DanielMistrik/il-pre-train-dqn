@@ -171,6 +171,7 @@ def full_training(
     target_update: int,
     allow_small_memory: bool = False,
     pretrain_done_callback=None,
+    pretrain_memory: ReplayMemory = None,
 ):
     """
     Incorporates pretraining and normal training into one function
@@ -196,18 +197,24 @@ def full_training(
     @param allow_small_memory: If True, allow sampling from memory
         with less than batch_size transitions. The number sampled
         will be equal to the length of memory.
+    @param pretrain_done_callback: The callback to call after pretraining
+    @param pretrain_samples: Replay memory sampled from dqn after pretraining
+        has been performed, its samples will be added to given memory
     """
-    pre_train(
-        dqn,
-        pretrain_optimizer,
-        pretrain_data_path,
-        pretrain_epochs,
-        pretrain_batch_size,
-        device=device,
-    )
+    if pretrain_epochs > 0:
+        pre_train(
+            dqn,
+            pretrain_optimizer,
+            pretrain_data_path,
+            pretrain_epochs,
+            pretrain_batch_size,
+            device=device,
+        )
     target_net.load_state_dict(dqn.state_dict())
     if pretrain_done_callback is not None:
         pretrain_done_callback(dqn)
+    if pretrain_memory is not None:
+        memory.extend(pretrain_memory)
     train(
         env,
         memory,
