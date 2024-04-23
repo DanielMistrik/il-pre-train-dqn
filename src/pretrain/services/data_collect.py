@@ -58,4 +58,4 @@ def data_collect(num_samples: int, data_env_name: str, path_to_dir: str) -> None
 
 
 if __name__ == '__main__':
-    data_collect(10_000, 'MountainCar-v0', None)
+    data_collect(10_000, 'Acrobot-v1', None)

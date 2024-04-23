@@ -6,5 +6,6 @@ coverage.xml
 .idea
 src/pretrain/data/*
 !src/pretrain/data/MountainCar-v0_10_000.npy
+!src/pretrain/data/LunarLander-v2_10_000.npy
 /tmp
 /tmpvideo

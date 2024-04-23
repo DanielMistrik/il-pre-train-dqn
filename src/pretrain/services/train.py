@@ -112,7 +112,7 @@ def pre_train(model, optimizer, data_path, num_epochs, batch_size=64, device="cp
 
 
 if __name__ == "__main__":
-    # Test on MountainCar-v0
-    dqn = DQN(2, 3)
+    # Test on LunarLander-v2
+    dqn = DQN(8, 4)
     optm = Adam(dqn.parameters(), lr=0.001)
-    pre_train(dqn, optm, "../data/MountainCar-v0_10_000.npy", 100, 32)
+    pre_train(dqn, optm, "../data/LunarLander-v2_10_000.npy", 100, 32)
