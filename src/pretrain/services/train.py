@@ -72,7 +72,7 @@ def gen_tv_graph(train_loss, valid_loss, data_path):
     plt.savefig(
         path_to_data_dir
         + "/tv_graph_"
-        + data_path[data_path.rfind("/") + 1 : data_path.rfind(".npy") + 1]
+        + data_path[data_path.rfind("/") + 1: data_path.rfind(".npy") + 1]
         + ".png"
     )
 

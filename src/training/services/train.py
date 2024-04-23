@@ -5,11 +5,19 @@ from gymnasium import Env
 from src.data.services.memory import ReplayMemory
 from src.data.models.transition import Transition
 import torch
+import numpy as np
 from torch.nn import functional as F
 from src.policy.services.epsilon_greedy import epsilon_greedy
 from torch import device
 from tqdm.auto import tqdm
+import matplotlib.pyplot as plt
 from src.pretrain.services.train import pre_train
+
+
+def create_loss_graph(loss_list, graph_path):
+    plt.plot(np.arange(len(loss_list)), loss_list, c="red")
+    plt.title("Loss graph for DQN")
+    plt.savefig(graph_path)
 
 
 def train_step(
@@ -84,6 +92,9 @@ def train_step(
     torch.nn.utils.clip_grad_norm_(dqn.parameters(), 100)
     optim.step()
 
+    # Return loss
+    return l.item()
+
 
 def train(
     env: Env,
@@ -97,6 +108,7 @@ def train(
     num_episodes: int,
     epsilon: float,
     target_update: int,
+    graph_path: str,
     allow_small_memory: bool = False,
 ):
     """
@@ -113,10 +125,13 @@ def train(
     @param num_episodes: The number of episodes to train for
     @param epsilon: The probability of taking a random action
     @param target_update: The number of episodes to update the target network
+    @param graph_path: The complete path (from where the code is run) for where to
+        store the graph that plots the loss. The path must be complete and include the suffix.
     @param allow_small_memory: If True, allow sampling from memory
         with less than batch_size transitions. The number sampled
         will be equal to the length of memory.
     """
+    losses = []
     for episode in tqdm(range(num_episodes)):
         state, _ = env.reset()
         state = torch.tensor(state, device=device, dtype=torch.float32).unsqueeze(0)
@@ -137,20 +152,24 @@ def train(
 
             state = next_state
 
-            train_step(
-                env,
-                memory,
-                dqn,
-                target_net,
-                optim,
-                batch_size,
-                gamma,
-                device,
-                allow_small_memory,
-            )
+            new_loss = train_step(
+                            env,
+                            memory,
+                            dqn,
+                            target_net,
+                            optim,
+                            batch_size,
+                            gamma,
+                            device,
+                            allow_small_memory,
+                        )
+            losses.append(new_loss)
 
         if episode % target_update == 0:
             target_net.load_state_dict(dqn.state_dict())
+
+    # Create the loss graph
+    create_loss_graph(losses, graph_path)
 
 
 def full_training(
