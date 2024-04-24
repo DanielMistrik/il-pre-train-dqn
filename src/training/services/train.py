@@ -110,6 +110,7 @@ def train(
     target_update: int,
     graph_path: str,
     allow_small_memory: bool = False,
+    after_step_callback=None,
 ):
     """
     Train a DQN model using the given environment.
@@ -130,8 +131,10 @@ def train(
     @param allow_small_memory: If True, allow sampling from memory
         with less than batch_size transitions. The number sampled
         will be equal to the length of memory.
+    @param after_step_callback: The callback to call after each step
     """
     losses = []
+    called = set()
     for episode in tqdm(range(num_episodes)):
         state, _ = env.reset()
         state = torch.tensor(state, device=device, dtype=torch.float32).unsqueeze(0)
@@ -153,17 +156,20 @@ def train(
             state = next_state
 
             new_loss = train_step(
-                            env,
-                            memory,
-                            dqn,
-                            target_net,
-                            optim,
-                            batch_size,
-                            gamma,
-                            device,
-                            allow_small_memory,
-                        )
+                env,
+                memory,
+                dqn,
+                target_net,
+                optim,
+                batch_size,
+                gamma,
+                device,
+                allow_small_memory,
+            )
             losses.append(new_loss)
+            if after_step_callback is not None and episode not in called:
+                after_step_callback(episode, dqn, device)
+                called.add(episode)
 
         if episode % target_update == 0:
             target_net.load_state_dict(dqn.state_dict())
@@ -172,6 +178,7 @@ def train(
     create_loss_graph(losses, graph_path)
 
 
+# deprecated
 def full_training(
     pretrain_data_path: str,
     pretrain_epochs: int,
@@ -191,6 +198,7 @@ def full_training(
     allow_small_memory: bool = False,
     pretrain_done_callback=None,
     pretrain_memory: ReplayMemory = None,
+    after_step_callback=None,
 ):
     """
     Incorporates pretraining and normal training into one function
@@ -219,6 +227,7 @@ def full_training(
     @param pretrain_done_callback: The callback to call after pretraining
     @param pretrain_samples: Replay memory sampled from dqn after pretraining
         has been performed, its samples will be added to given memory
+    @param after_step_callback: The callback to call after each step
     """
     if pretrain_epochs > 0:
         pre_train(
@@ -247,4 +256,6 @@ def full_training(
         epsilon,
         target_update,
         allow_small_memory,
+        after_step_callback=after_step_callback,
+        graph_path="loss_graph.png",
     )

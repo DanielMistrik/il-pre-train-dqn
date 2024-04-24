@@ -30,6 +30,13 @@ class DQN(nn.Module):
         self.num_layers = num_layers
         self.hidden_size = hidden_size if hidden_size is not None else obs_dim * 10
         self.activation = activation
+        self.kwargs = {
+            "obs_dim": obs_dim,
+            "act_dim": act_dim,
+            "num_layers": num_layers,
+            "hidden_size": hidden_size,
+            "activation": activation,
+        }
 
         self.first_layer = nn.Linear(self.obs_dim, self.hidden_size)
         self.hidden_layers = nn.ModuleList(
