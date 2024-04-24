@@ -1,6 +1,7 @@
 import gymnasium as gym
 import numpy as np
 import os
+import argparse
 from gymnasium.utils.play import play
 
 collected_data = []
@@ -26,6 +27,11 @@ env_names_to_metadata = {
         }, 1, 30
     )
 }
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--path_to_dir', default=None,
+                    help='The path from where you are running the script to where the script is located')
 
 
 def data_collect_callback(obs_t, obs_tp1, action, rew, terminated, truncated, info):
@@ -58,4 +64,5 @@ def data_collect(num_samples: int, data_env_name: str, path_to_dir: str) -> None
 
 
 if __name__ == '__main__':
-    data_collect(10_000, 'Acrobot-v1', None)
+    args = parser.parse_args()
+    data_collect(10_000, 'Acrobot-v1', args.path_to_dir)
