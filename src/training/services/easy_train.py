@@ -14,6 +14,8 @@ from tqdm.auto import tqdm
 from typing import List
 import random
 from typing import Optional
+import os
+from pathlib import Path
 
 
 def create_video(frames, fps=15, output_name="output"):
@@ -72,16 +74,24 @@ def easy_train(
     video_output_dir: str = "./tmpvideo",
     rewards_output_dir: str = "./tmp",
     graph_output_dir: str = "./tmpgraphs",
-    save_model_path: Optional[str] = "./tmpmodel",
+    save_model_path: Optional[str] = "./tmpmodels",
 ) -> DQN:
+    os.makedirs(video_output_dir, exist_ok=True)
+    os.makedirs(rewards_output_dir, exist_ok=True)
+    os.makedirs(graph_output_dir, exist_ok=True)
+    if save_model_path is not None:
+        os.makedirs(save_model_path, exist_ok=True)
+
     def after_test_callback(episode, dqn, device):
         if episode in train_vis_points:
             with torch.no_grad():
                 save_indices = random.sample(
                     range(train_vis_trials), train_vis_trial_saves
                 )
+                print(f"Saved indices: {save_indices}")
                 for i in range(train_vis_trials):
-                    name = f"after_training_{env_name}_{episode}_sample_{i}"
+                    name = f"after_training_{env_name}_episode_{episode}_sample_{i}_pretrain_epochs_{pretrain_epochs}_target_update_{target_update}"
+                    print(f"Testing {name}")
                     rewards = test_dqn(
                         dqn,
                         gym.make(env_name, render_mode="rgb_array"),
@@ -91,7 +101,6 @@ def easy_train(
                     )
                     with open(f"{rewards_output_dir}/{name}.json", "w") as f:
                         json.dump(rewards, f)
-                    return rewards
 
     env = gym.make(env_name)
     state_dim, action_dim = get_dims(env)
@@ -122,7 +131,10 @@ def easy_train(
         output_name=f"pretrained_{env_name}",
         output_dir=video_output_dir,
     )
-    with open(f"{rewards_output_dir}/pretrained_{env_name}.json", "w") as f:
+    with open(
+        f"{rewards_output_dir}/pretrained_{env_name}_pretrain_epochs_{pretrain_epochs}.json",
+        "w",
+    ) as f:
         json.dump(pretrained_rewards, f)
     pretrain_memory = ReplayMemory(pretrain_replay_samples)
     with torch.no_grad():
@@ -159,7 +171,7 @@ def easy_train(
         num_episodes=num_training_episodes,
         epsilon=epsilon,
         target_update=target_update,
-        graph_path=f"{graph_output_dir}/{env_name}_{num_training_episodes}_episodes.png",
+        graph_path=f"{graph_output_dir}/{env_name}_episodes_{num_training_episodes}_pretrain_epochs_{pretrain_epochs}_target_update_{target_update}",
         after_step_callback=after_test_callback,
     )
     if save_model_path is not None:
@@ -170,6 +182,6 @@ def easy_train(
                 "kwargs": dqn.kwargs,
                 "trained_episodes": num_training_episodes,
             },
-            save_model_path,
+            f"{save_model_path}/{env_name}_episodes_{num_training_episodes}_pretrain_epochs_{pretrain_epochs}_target_update_{target_update}.pt",
         )
     return dqn

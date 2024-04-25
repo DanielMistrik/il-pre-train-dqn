@@ -10,3 +10,5 @@ src/pretrain/data/*
 !src/pretrain/data/Acrobot-v1_10_000.npy
 /tmp
 /tmpvideo
+/tmpgraphs
+/tmpmodels
