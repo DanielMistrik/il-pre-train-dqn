@@ -88,10 +88,8 @@ def easy_train(
                 save_indices = random.sample(
                     range(train_vis_trials), train_vis_trial_saves
                 )
-                print(f"Saved indices: {save_indices}")
                 for i in range(train_vis_trials):
                     name = f"after_training_{env_name}_episode_{episode}_sample_{i}_pretrain_epochs_{pretrain_epochs}_target_update_{target_update}"
-                    print(f"Testing {name}")
                     rewards = test_dqn(
                         dqn,
                         gym.make(env_name, render_mode="rgb_array"),
