@@ -1,0 +1,5 @@
+'Acrobot-v1_trained with 0 episodes, pre-trained on 10 epochs with target update of 0': (-353.3, 151.66)
+'Acrobot-v1_trained with 0 episodes, pre-trained on 100 epochs with target update of 0': (-276.7 , 131.48)
+'Acrobot-v1_trained with 0 episodes, pre-trained on 500 epochs with target update of 0': (-431.5, 138.44)
+'Human Player': (-180.1,  58.59)
+'Random Player': (-500, 0)
