@@ -52,7 +52,7 @@ def collect_data_on_model(env_name):
     # Episodes range in 100,500,1000,2000,3000,4999
     for ep in [100, 500, 1000, 2000, 3000, 4999]:
         # Pre train epochs range in 10, 100, 500
-        for pt_epch in [10, 100, 500]:
+        for pt_epch in [0, 10, 100, 500]:
             # Target Update range i 100, 500, 1000
             for trgt_update in [100, 500, 1000]:
                 key = f'{env_name}_trained with {ep} episodes, pre-trained on {pt_epch} epochs with target update of {trgt_update}'
@@ -61,4 +61,4 @@ def collect_data_on_model(env_name):
 
 if __name__ == "__main__":
     #print(get_result_stats('LunarLander-v2', 100, 100, 100))
-    print(collect_data_on_model('LunarLander-v2'))
+    print(collect_data_on_model('MountainCar-v0'))

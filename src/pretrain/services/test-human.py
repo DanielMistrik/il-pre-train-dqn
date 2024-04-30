@@ -43,4 +43,4 @@ def data_collect(num_samples: int, data_env_name: str) -> None:
 
 
 if __name__ == '__main__':
-    print(data_collect(10, 'LunarLander-v2'))
+    print(data_collect(10, 'MountainCar-v0'))
