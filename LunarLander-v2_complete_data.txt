@@ -69,9 +69,9 @@
 'LunarLander-v2_trained with 4999 episodes, pre-trained on 100 epochs with target update of 1000': (-345.55576164570886, 159.7118839759003),
 'LunarLander-v2_trained with 4999 episodes, pre-trained on 500 epochs with target update of 100': (-139.9091932259858, 24.54137892137413),
 'LunarLander-v2_trained with 4999 episodes, pre-trained on 500 epochs with target update of 500': (-114.33060559647524, 36.861924385815065),
-'LunarLander-v2_trained with 4999 episodes, pre-trained on 500 epochs with target update of 1000': (-129.96063675257338, 29.289416265050065)
+'LunarLander-v2_trained with 4999 episodes, pre-trained on 500 epochs with target update of 1000': (-129.96063675257338, 29.289416265050065),
 'LunarLander-v2 trained with 0 episodes, pre-trained on 10 epochs with target update of 0: (-151.46, 175.01),
 'LunarLander-v2 trained with 0 episodes, pre-trained on 100 epochs with target update of 0: (-26.26, 120.98),
 'LunarLander-v2 trained with 0 episodes, pre-trained on 500 epochs with target update of 0: (-161.43, 232.33),
-'LunarLander-v2 randomly initialized': (-586.94, 163.04)
+'LunarLander-v2 randomly initialized': (-586.94, 163.04),
 'Human Player': (13.84 , 14.75)

@@ -56,9 +56,12 @@ def collect_data_on_model(env_name):
             # Target Update range i 100, 500, 1000
             for trgt_update in [100, 500, 1000]:
                 key = f'{env_name}_trained with {ep} episodes, pre-trained on {pt_epch} epochs with target update of {trgt_update}'
-                return_dict[key] = get_result_stats(env_name, ep, pt_epch, trgt_update)
+                try:
+                    return_dict[key] = get_result_stats(env_name, ep, pt_epch, trgt_update)
+                except ZeroDivisionError:
+                    pass
     return return_dict
 
 if __name__ == "__main__":
     #print(get_result_stats('LunarLander-v2', 100, 100, 100))
-    print(collect_data_on_model('MountainCar-v0'))
+    print(collect_data_on_model('Acrobot-v1'))
